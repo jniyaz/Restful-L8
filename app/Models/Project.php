@@ -11,6 +11,16 @@ class Project extends Model
 
     protected $fillable = ['title'];
 
+    // accessors
+    public function getImagePathAttribute()
+    {
+        if( is_null($this->image) ) {
+            return null;
+        }
+
+        return asset('storage/' . $this->image);
+    }
+
     public function user()
     {
         return $this->belongsTo(\App\Models\Project::class);
