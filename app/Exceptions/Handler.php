@@ -37,4 +37,34 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function render($request, Throwable $e)
+    {
+        if($request->is('api*')) {
+            
+            if( $e instanceof \Illuminate\Auth\AuthenticationException ) {
+                return response(['status' => 'error', 'error' => $e->getMessage()], 403);
+            }
+
+            if( $e instanceof \Illuminate\Validation\ValidationException ) {
+                return response(['status' => 'error', 'error' => $e->errors()], 422);
+            }
+            
+            if( $e instanceof \Illuminate\Auth\Access\AuthorizationException ) {
+                return response(['status' => 'error', 'error' => $e->getMessage()], 403);
+            }
+            
+            if( $e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException ||
+                $e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException 
+            ) {
+                return response(['status' => 'error', 'error' => "Resource not found"], 404);
+            }
+
+            return response(['status' => 'error', 'error' => "Something went wrong"], 500);
+            
+            // dd($e);
+        }
+
+        parent::render($request, $e);
+    }
 }

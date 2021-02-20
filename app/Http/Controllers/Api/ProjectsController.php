@@ -5,10 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProjectRequest;
+use App\Http\Resources\ProjectCollection;
 use App\Http\Resources\Project as ProjectResource;
 
 class ProjectsController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Project::class, 'project');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +24,7 @@ class ProjectsController extends Controller
     public function index()
     {
         $projects = Project::where('user_id', auth()->user()->id)->get();
-        return $projects;
+        return new ProjectCollection($projects);
     }
 
     /**
@@ -26,9 +33,10 @@ class ProjectsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProjectRequest $request)
     {
-        //
+        $project = auth()->user()->projects()->create($request->all());
+        return new ProjectResource($project);
     }
 
     /**
@@ -50,9 +58,10 @@ class ProjectsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ProjectRequest $request, Project $project)
     {
-        //
+        $project->update($request->all());
+        return new ProjectResource($project);
     }
 
     /**
@@ -61,8 +70,9 @@ class ProjectsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Project $project)
     {
-        //
+        $project->delete();
+        return ['status' => 'OK'];
     }
 }
