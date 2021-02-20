@@ -11,6 +11,15 @@ class Task extends Model
 
     protected $fillable = ['project_id', 'title', 'due_date'];
 
+    // Accessors
+
+    public function getPriorityAttribute()
+    {
+        return ($this->due_date) ? 'High' : 'Low';
+    }
+
+    // Relationships
+
     public function project()
     {
         return $this->belongsTo(\App\Models\Project::class);
