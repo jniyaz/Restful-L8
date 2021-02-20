@@ -23,7 +23,7 @@ class ProjectsController extends Controller
      */
     public function index()
     {
-        $projects = Project::where('user_id', auth()->user()->id)->get();
+        $projects = Project::where('user_id', auth()->user()->id)->withCount('tasks')->get();
         return new ProjectCollection($projects);
     }
 
@@ -47,6 +47,7 @@ class ProjectsController extends Controller
      */
     public function show(Project $project)
     {
+        $tasks = $project->tasks;
         // return $project;
         return new ProjectResource($project);
     }
