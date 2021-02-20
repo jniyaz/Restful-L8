@@ -55,14 +55,17 @@ class Handler extends ExceptionHandler
             }
             
             if( $e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException ||
-                $e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException 
+            $e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException 
             ) {
                 return response(['status' => 'error', 'error' => "Resource not found"], 404);
+            }
+            
+            if( $e instanceof \Illuminate\Http\Exceptions\ThrottleRequestsException ) {
+                return response(['status' => 'error', 'error' => "Api limit reached"], 429);
             }
 
             return response(['status' => 'error', 'error' => "Something went wrong"], 500);
             
-            // dd($e);
         }
 
         parent::render($request, $e);
